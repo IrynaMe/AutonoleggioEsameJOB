@@ -21,7 +21,7 @@ La schermata iniziale richiede di registrarsi, di fare login o di uscire.
    password: Maria.78
 
    Un esempio di log di Cliente è il seguente: 
-   mail: mario83@gmail.com
+   mail: "mario83@gmail.com"
    password: Mario.83
 
 3. Esci
