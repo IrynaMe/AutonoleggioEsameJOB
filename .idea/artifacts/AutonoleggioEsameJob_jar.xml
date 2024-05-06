@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="AutonoleggioEsameJob:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/AutonoleggioEsameJob_jar</output-path>
+    <root id="archive" name="AutonoleggioEsameJob.jar">
+      <element id="module-output" name="AutonoleggioEsameJob" />
+    </root>
+  </artifact>
+</component>
