@@ -17,7 +17,7 @@ La schermata iniziale richiede di registrarsi, di fare login o di uscire.
    Chiede di inserire le credenziali: mail e password.
 
    Un esempio di log di Manager è il seguente: 
-   mail: maria@auto.com
+   mail: mario83 [at] gmail [dot] com
    password: Maria.78
 
    Un esempio di log di Cliente è il seguente: 
