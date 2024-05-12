@@ -17,7 +17,6 @@ import java.util.*;
 import java.io.File;
 
 public class GestioneAutonoleggio {
-
     ConsoleManage cm = new ConsoleManage();
     private Map<String, AutoNoleggiabile> parcoAuto = new HashMap<>();
     private Map<Integer, NoleggioStorico> autoNoleggate = new HashMap<>();
@@ -33,7 +32,195 @@ public class GestioneAutonoleggio {
     private final String fileBatmoboli = "src" + File.separator + "file" + File.separator + "batmobili.txt";
     private final String fileNoleggioStorico = "src" + File.separator + "file" + File.separator + "noleggioStorico.txt";
 
+//*****************Gestione menu*****************
+    public Integer registrazioneLogin() {
+        Integer scelta = null;
+        System.out.println("Sei registrato?\n1 -> registrazione\n2 -> login\n0 ->esci");
+        int[] sceltaArr = cm.giveInt("Inserisci la scelta:", "Input non valido, riprova", "Iserimento non è andato a buon fine", 5);
+        if (sceltaArr[0] == 1) {
+            scelta = sceltaArr[1];
+            System.out.println("il numero inserito è: " + scelta);
+        }
+        return scelta;
+    }
 
+    public void stampaMenu() {
+        caricaFileUtenti();
+        caricaFileAuto();
+        caricaFileBatmobili();
+        caricaFileNoleggio();
+        OpzioniCliente opzioniCliente = null;
+        OpzioniManager opzioniManager = null;
+        OpzioniBatman opzioniBatman = null;
+        Integer input = null;
+        do {
+            try {
+                input = registrazioneLogin();
+                if (input == 1) {
+                    aggiungiUtente();
+                } else if (input == 2) {
+                    login();
+                    boolean isFinito = false;
+                    if (utenteAttivo != null) {
+                        switch (utenteAttivo.getRuolo()) {
+
+                            case CLIENTE:
+
+                                while (utenteAttivo.getRuolo().equals(Ruoli.CLIENTE)) {
+                                    opzioniCliente = stampaOpzioniCliente();
+
+                                    if (opzioniCliente.equals(OpzioniCliente.CERCA_PER_COSTO)) cercaAutoCostoDisp();
+                                    if (opzioniCliente.equals(OpzioniCliente.CERCA_PER_MARCA_MODELLO))
+                                        cercaAutoMarcaDisp();
+                                    if (opzioniCliente.equals(OpzioniCliente.VEDI_LISTA)) mostraAutoDisp();
+                                    if (opzioniCliente.equals(OpzioniCliente.NOLEGGIA_AUTO)) noleggia();
+                                    if (opzioniCliente.equals(OpzioniCliente.VEDI_PROPRI_NOLEGGI))
+                                        vediNoleggiDelCliente();
+                                    if (opzioniCliente.equals(OpzioniCliente.ANNULLA_NOLEGGIO)) annullaNoleggio();
+                                    if (opzioniCliente.equals(OpzioniCliente.ESCI)) {
+                                     //   utenteAttivo.setRuolo(Ruoli.NESSUNO);
+                                        break;
+                                    }
+                                }
+                                break;
+                            case MANAGER:
+                                while (utenteAttivo.getRuolo().equals(Ruoli.MANAGER)) {
+                                    opzioniManager = stampaOpzioniManager();
+
+                                    if (opzioniManager.equals(OpzioniManager.CERCA_PER_COSTO)) cercaAutoCostoDisp();
+                                    if (opzioniManager.equals(OpzioniManager.CERCA_PER_MARCA_MODELLO))
+                                        cercaAutoMarcaDisp();
+                                    if (opzioniManager.equals(OpzioniManager.VEDI_LISTA)) mostraAutoDisp();
+                                    if (opzioniManager.equals(OpzioniManager.NOLEGGIA_AUTO)) noleggia();
+                                    if (opzioniManager.equals(OpzioniManager.AGGIUNGI_AUTO)) aggiungiAuto();
+                                    if (opzioniManager.equals(OpzioniManager.RIMUOVI_AUTO)) rimuoviAuto();
+                                    if (opzioniManager.equals(OpzioniManager.CAMBIA_STATO_AUTO)) cambiaStatoAuto();
+                                    if (opzioniManager.equals(OpzioniManager.STAMPA_LISTA_AUTO)) mostraAuto();
+                                    if (opzioniManager.equals(OpzioniManager.STAMPA_LISTA_CLIENTI)) stampaClienti();
+                                    if (opzioniManager.equals(OpzioniManager.STAMPA_LISTA_UTENTI)) stampaUtenti();
+                                    if (opzioniManager.equals(OpzioniManager.VEDI_AUTO_NOLEGGIATE))
+                                        stampaAutoNoleggiate();
+                                    if (opzioniManager.equals(OpzioniManager.RESTITUISCI_AUTO)) restituisciAuto();
+                                    if (opzioniManager.equals(OpzioniManager.ANNULLA_NOLEGGIO)) annullaNoleggio();
+                                    if (opzioniManager.equals(OpzioniManager.VEDI_PROPRI_NOLEGGI))
+                                        vediNoleggiDelCliente();
+                                    if (opzioniManager.equals(OpzioniManager.ESCI)) {
+                                       // utenteAttivo.setRuolo(Ruoli.NESSUNO);
+                                        break;
+                                    }
+                                }
+                                break;
+                            case BATMAN:
+                                while (utenteAttivo.getRuolo().equals(Ruoli.BATMAN)) {
+                                    opzioniBatman = stampaOpzioniBatman();
+                                    if (opzioniBatman.equals(OpzioniBatman.AGGIUNGI_BATMOBILE)) aggiungiBatmobile();
+                                    if (opzioniBatman.equals(OpzioniBatman.RIMUOVI_BATMOBILE)) rimuoviBatmobile();
+                                    if (opzioniBatman.equals(OpzioniBatman.VEDI_LISTA_BATMOBILI)) stampaBatmobili();
+                                    if (opzioniBatman.equals(OpzioniBatman.ESCI)) {
+                                       // utenteAttivo.setRuolo(Ruoli.NESSUNO);
+                                        break;
+                                    }
+                                }
+                                break;
+                            default:
+                                System.out.println("Inserimento non valido");
+                                break;
+                        }
+                    }
+                }else if(input==0){
+                    System.out.println("Programma in chiusura....Arrivederci!");
+                    return;
+                }else{
+                    System.out.println("inserimento non valido, riprova");
+                }
+
+            } catch (NumberFormatException e) {
+                System.out.println("Formato errato: inserisci il numero");
+            }
+
+        } while (true);
+
+    }
+    public OpzioniManager stampaOpzioniManager() {
+        int input=-1;
+        OpzioniManager opzioniManager=null;
+        OpzioniManager[] opzioniManagerArr=OpzioniManager.values();
+
+        do {
+            for (int i = 0; i < opzioniManagerArr.length; i++) {
+                System.out.println((i + 1) + " -> " + opzioniManagerArr[i].getDescription());
+            }
+           // System.out.println("Inserisci la tua scelta: ");
+            int[] inputArr = cm.giveInt("Inserisci la scelta:", "Input non valido, riprova", "Iserimento non è andato a buon fine", 5);
+            if (inputArr[0] == 1) {
+                input = inputArr[1];
+                System.out.println("il numero inserito è: " + input);
+            }
+            if (input < 0 || input > OpzioniManager.values().length) {
+                System.out.println("Scelta non valida. Riprova.");
+               // indexMenu = 0;
+            }
+            opzioniManager=OpzioniManager.values()[input - 1];
+        } while (opzioniManager==null);
+        System.out.println("Hai scelto: " + OpzioniManager.values()[input - 1]);
+      //  indexMenu = 0;
+        return opzioniManager;
+
+    }
+
+    public OpzioniCliente stampaOpzioniCliente() {
+        int input=-1;
+        OpzioniCliente opzioniCliente=null;
+        OpzioniCliente[] opzioniClienteArr=OpzioniCliente.values();
+
+        do {
+            for (int i = 0; i < opzioniClienteArr.length; i++) {
+                System.out.println((i + 1) + " -> " + opzioniClienteArr[i].getDescription());
+            }
+            // System.out.println("Inserisci la tua scelta: ");
+            int[] inputArr = cm.giveInt("Inserisci la scelta:", "Input non valido, riprova", "Iserimento non è andato a buon fine", 5);
+            if (inputArr[0] == 1) {
+                input = inputArr[1];
+                System.out.println("il numero inserito è: " + input);
+            }
+            if (input < 0 || input > OpzioniManager.values().length) {
+                System.out.println("Scelta non valida. Riprova.");
+             //   indexMenu = 0;
+            }
+            opzioniCliente=OpzioniCliente.values()[input - 1];
+        } while (opzioniCliente==null);
+        System.out.println("Hai scelto: " + OpzioniManager.values()[input - 1]);
+        //  indexMenu = 0;
+        return opzioniCliente;
+    }
+
+    public OpzioniBatman stampaOpzioniBatman() {
+        int input=-1;
+        OpzioniBatman opzioniBatman=null;
+        OpzioniBatman[] opzioniBatmanArr=OpzioniBatman.values();
+
+        do {
+            for (int i = 0; i < opzioniBatmanArr.length; i++) {
+                System.out.println((i + 1) + " -> " + opzioniBatmanArr[i].getDescription());
+            }
+            // System.out.println("Inserisci la tua scelta: ");
+            int[] inputArr = cm.giveInt("Inserisci la scelta:", "Input non valido, riprova", "Iserimento non è andato a buon fine", 5);
+            if (inputArr[0] == 1) {
+                input = inputArr[1];
+                System.out.println("il numero inserito è: " + input);
+            }
+            if (input < 0 || input > OpzioniManager.values().length) {
+                System.out.println("Scelta non valida. Riprova.");
+             //   indexMenu = 0;
+            }
+            opzioniBatman=OpzioniBatman.values()[input - 1];
+        } while (opzioniBatman==null);
+        System.out.println("Hai scelto: " + OpzioniManager.values()[input - 1]);
+        //  indexMenu = 0;
+        return opzioniBatman;
+    }
+
+//********************Fine gestione menu***********
     public static String hashPassword(String password) { //ENCODING EMAIL
         try {
 
@@ -56,7 +243,7 @@ public class GestioneAutonoleggio {
 
     public void login() {
         boolean isTrovato = false;
-        // Utente utenteAttivo = null;
+        //Utente utenteAttivo = null;
         String mail = null;
         String[] mailArr = cm.giveMail("Inserisci un indirizzo Email: min 8 caratteri:1 Maiuscolo e 1 simbolo e 1 numero", "Non è stato riconosciuto come un indirizzo Email",
                 "Non è stao inserito un indirizzo Email", 3);
@@ -457,7 +644,7 @@ public class GestioneAutonoleggio {
     }
 
 
-    //metodo di supporto da chiamare in restuituisci Auto se restituisci prima o dopo
+    //metodo di supporto da chiamare in restuituisci Auto se restituisci prima o dopo-RIcalcola costo effettivo
     public NoleggioStorico calcolaCosto(NoleggioStorico noleggioStorico) {
         LocalTime minHour = null;
         LocalDate dateFine = null;
@@ -486,7 +673,7 @@ public class GestioneAutonoleggio {
         return noleggioStorico;
     }
 
-    //vengono chiamati mostraAutoDisp e calcolaCosto e cercaAutoPErTarga
+    //vengono chiamati mostraAutoDisp e cercaAutoPErTarga
     public void noleggia() {
         //inserimento data return boolean se giusta
         Double costo = null;
@@ -715,7 +902,6 @@ public class GestioneAutonoleggio {
         salvaFileBatmobili();
     }
 
-
     public void salvaFileBatmobili() {
         String linea;
         try {
@@ -731,102 +917,6 @@ public class GestioneAutonoleggio {
         }
     }
 
-    public void esci() {
-        utenteAttivo = null;
-    }
-
-    public void stampaMenu() {
-        caricaFileUtenti();
-        caricaFileAuto();
-        caricaFileBatmobili();
-        caricaFileNoleggio();
-        OpzioniCliente opzioniCliente = null;
-        OpzioniManager opzioniManager = null;
-        OpzioniBatman opzioniBatman = null;
-        Integer input = null;
-        do {
-            try {
-                input = cm.registrazioneLogin();
-                if (input == 1) {
-                    aggiungiUtente();
-                }
-                if (input == 2) {
-                    login();
-                    boolean isFinito = false;
-                    if (utenteAttivo != null) {
-                        switch (utenteAttivo.getRuolo()) {
-
-                            case CLIENTE:
-
-                                while (utenteAttivo.getRuolo().equals(Ruoli.CLIENTE)) {
-                                    opzioniCliente = cm.stampaOpzioniCliente();
-
-                                    if (opzioniCliente.equals(OpzioniCliente.CERCA_PER_COSTO)) cercaAutoCostoDisp();
-                                    if (opzioniCliente.equals(OpzioniCliente.CERCA_PER_MARCA_MODELLO))
-                                        cercaAutoMarcaDisp();
-                                    if (opzioniCliente.equals(OpzioniCliente.VEDI_LISTA)) mostraAutoDisp();
-                                    if (opzioniCliente.equals(OpzioniCliente.NOLEGGIA_AUTO)) noleggia();
-                                    if (opzioniCliente.equals(OpzioniCliente.VEDI_PROPRI_NOLEGGI))
-                                        vediNoleggiDelCliente();
-                                    if (opzioniCliente.equals(OpzioniCliente.ANNULLA_NOLEGGIO)) annullaNoleggio();
-                                    if (opzioniCliente.equals(OpzioniCliente.ESCI)) {
-                                        utenteAttivo.setRuolo(Ruoli.NESSUNO);
-                                    }
-                                }
-                                break;
-                            case MANAGER:
-                                while (utenteAttivo.getRuolo().equals(Ruoli.MANAGER)) {
-                                    opzioniManager = cm.stampaOpzioniManager();
-
-                                    if (opzioniManager.equals(OpzioniManager.CERCA_PER_COSTO)) cercaAutoCostoDisp();
-                                    if (opzioniManager.equals(OpzioniManager.CERCA_PER_MARCA_MODELLO))
-                                        cercaAutoMarcaDisp();
-                                    if (opzioniManager.equals(OpzioniManager.VEDI_LISTA)) mostraAutoDisp();
-                                    if (opzioniManager.equals(OpzioniManager.NOLEGGIA_AUTO)) noleggia();
-                                    if (opzioniManager.equals(OpzioniManager.AGGIUNGI_AUTO)) aggiungiAuto();
-                                    if (opzioniManager.equals(OpzioniManager.RIMUOVI_AUTO)) rimuoviAuto();
-                                    if (opzioniManager.equals(OpzioniManager.CAMBIA_STATO_AUTO)) cambiaStatoAuto();
-                                    if (opzioniManager.equals(OpzioniManager.STAMPA_LISTA_AUTO)) mostraAuto();
-                                    if (opzioniManager.equals(OpzioniManager.STAMPA_LISTA_CLIENTI)) stampaClienti();
-                                    if (opzioniManager.equals(OpzioniManager.STAMPA_LISTA_UTENTI)) stampaUtenti();
-                                    if (opzioniManager.equals(OpzioniManager.VEDI_AUTO_NOLEGGIATE))
-                                        stampaAutoNoleggiate();
-                                    if (opzioniManager.equals(OpzioniManager.RESTITUISCI_AUTO)) restituisciAuto();
-                                    if (opzioniManager.equals(OpzioniManager.ANNULLA_NOLEGGIO)) annullaNoleggio();
-                                    if (opzioniManager.equals(OpzioniManager.VEDI_PROPRI_NOLEGGI))
-                                        vediNoleggiDelCliente();
-                                    if (opzioniManager.equals(OpzioniManager.ESCI)) {
-                                        utenteAttivo.setRuolo(Ruoli.NESSUNO);
-                                    }
-                                }
-                                break;
-                            case BATMAN:
-                                while (utenteAttivo.getRuolo().equals(Ruoli.BATMAN)) {
-                                    opzioniBatman = cm.stampaOpzioniBatman();
-                                    if (opzioniBatman.equals(OpzioniBatman.AGGIUNGI_BATMOBILE)) aggiungiBatmobile();
-                                    if (opzioniBatman.equals(OpzioniBatman.RIMUOVI_BATMOBILE)) rimuoviBatmobile();
-                                    if (opzioniBatman.equals(OpzioniBatman.VEDI_LISTA_BATMOBILI)) stampaBatmobili();
-                                    if (opzioniBatman.equals(OpzioniBatman.ESCI)) {
-                                        utenteAttivo.setRuolo(Ruoli.NESSUNO);
-                                    }
-                                }
-                                break;
-                            default:
-                                System.out.println("Stai per uscire");
-                                break;
-                        }
-                    }
-                }
-
-            } catch (NumberFormatException e) {
-                System.out.println("Formato errato: inserisci il numero");
-            }
-
-        } while (input == null || (input != 2 && input != 0));
-
-        System.out.println("Arrivederci!");
-        cm.closeScanner();
-    }
 
 }//
 
