@@ -1,4 +1,4 @@
-Gruppo secondo banco composto da: Iryna Melmikava, Giulio Mazzitelli, Annalisa Lupo e Simona Lucchetti.
+Gruppo secondo banco composto da: Iryna Melnikava, Giulio Mazzitelli, Annalisa Lupo e Simona Lucchetti.
 
 Il programma è un gestionale di un ipotetico autonoleggio eseguito dal gruppo come test nell'ambito del corso Java On Boarding di Accademia Informatica. 
 Il programma si gestisce tramite console.
