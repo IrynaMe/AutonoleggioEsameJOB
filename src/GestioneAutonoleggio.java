@@ -129,6 +129,7 @@ public class GestioneAutonoleggio {
                     }
                 }else if(input==0){
                     System.out.println("Programma in chiusura....Arrivederci!");
+                    cm.closeScanner();
                     return;
                 }else{
                     System.out.println("inserimento non valido, riprova");
@@ -139,6 +140,7 @@ public class GestioneAutonoleggio {
             }
 
         } while (true);
+
 
     }
     public OpzioniManager stampaOpzioniManager() {
